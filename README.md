@@ -59,6 +59,8 @@ Every client holds a local copy of the Yjs document. When a user types, Yjs gene
 - Yjs requires no server-side understanding of the document. The relay is stateless.
 - OT requires a central server to transform and sequence every operation, adding complexity and a stateful server requirement.
 - Yjs handles offline edits and reconnection automatically via its sync protocol.
+**Tradeoff accepted:** The server does not hold the authoritative Yjs document state in memory. 
+If the server restarts while users are editing, clients resync from the last saved database snapshot, meaning up to 2 seconds of unsaved edits could be lost.
 
 ---
 

@@ -1,0 +1,9 @@
+.cm-ySelectionInfo {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid #120000;
+  color: white;
+  opacity: 1 !important;
+  font-family: sans-serif;
+}
