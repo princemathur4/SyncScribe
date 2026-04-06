@@ -25,14 +25,33 @@ The database is seeded automatically with sample pages and two demo accounts:
 
 ## Features
 
+### ✅ Implemented Features
+
 - **Real-time collaboration** — multiple users edit the same page simultaneously using Yjs CRDTs. Cursor positions and presence are visible live.
-- **Markdown editor** — CodeMirror 6 with syntax highlighting and a toggle-able live preview.
+- **Markdown editor** — CodeMirror 6 with syntax highlighting, code block support, and tables (GFM).
+- **Live preview toggle** — switch between editor and preview modes; preview supports full GitHub-flavored markdown rendering.
 - **Nested page tree** — pages organized hierarchically; sidebar shows a collapsible tree with expand/collapse per node.
-- **Create pages** — create new pages from the sidebar with an optional parent, generating a URL slug automatically.
-- **Full-text search** — PostgreSQL `tsvector` search with highlighted snippets, debounced as you type.
-- **Wiki-links** — click `[[Page Name]]` links in preview to navigate directly to that page.
-- **Last edited by** — each page tracks who last edited it and when.
+- **Page creation** — create new pages from the sidebar with an optional parent; URL slug is generated automatically.
+- **Full-text search** — PostgreSQL `tsvector` search with highlighted snippets and context, debounced as you type.
+- **Wiki-links** — click `[[Page Name]]` links in the preview to navigate directly to that page.
+- **Last edited metadata** — each page tracks the user who last edited it and the timestamp.
 - **JWT authentication** — register/login flow; all write operations require a valid token.
+- **Editor toolbar** — quick formatting buttons for bold, italic, headers, code blocks, and lists.
+- **Desktop UI** — works on desktop browsers with a collapsible sidebar and clean layout.
+- **Database persistence** — all pages and user data persist in PostgreSQL; collaborative state fully recovers on reconnect.
+
+### 📋 Planned Features
+
+- **Alembic migrations** — replace simple `create_all` with proper versioned schema migrations for safer production deployments.
+- **Distributed WebSocket relay** — add Redis pub/sub support to enable multi-process backend scaling and Yjs state sharing.
+- **Version history & page rollback** — restore previous versions of pages with diff view and full revision history.
+- **Page-level permissions** — granular sharing controls (view-only, edit, admin) for specific pages or folders.
+- **File and image uploads** — embed images and attachments directly within pages.
+- **Real-time cursor indicators** — see which users are currently editing and their cursor positions.
+- **Comments and annotations** — inline comments on pages with threaded discussions.
+- **Page templates** — create reusable page templates for consistent documentation.
+- **Dark mode** — theme toggle for editor and UI.
+- **Export to PDF** — download pages as formatted PDFs.
 
 ---
 
