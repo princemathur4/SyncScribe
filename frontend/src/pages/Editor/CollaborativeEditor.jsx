@@ -319,20 +319,21 @@ function CollaborativeEditor({ pageSlug, username, onNavigate }) {
           </strong>
         </span>
         <span>Users editing: <strong>{connectedUsers}</strong></span>
-        {pageInfo?.lastEditor && (
-          <span style={{ color: "#999" }}>
-            Last edited by <strong>{pageInfo.lastEditor}</strong>
-            {pageInfo.updatedAt && <> · {formatRelativeTime(pageInfo.updatedAt)}</>}
+        <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+          <span style={{
+            color: saveStatus === "saved" ? "green" : saveStatus === "error" ? "red" : "#999",
+          }}>
+            {saveStatus === "saving" && "Saving..."}
+            {saveStatus === "saved" && "Saved"}
+            {saveStatus === "error" && "Save failed"}
           </span>
-        )}
-        <span style={{
-          marginLeft: "auto",
-          color: saveStatus === "saved" ? "green" : saveStatus === "error" ? "red" : "#999",
-        }}>
-          {saveStatus === "saving" && "Saving..."}
-          {saveStatus === "saved" && "Saved"}
-          {saveStatus === "error" && "Save failed"}
-        </span>
+          {pageInfo?.lastEditor && (
+            <span style={{ color: "#999" }}>
+              Last edited by <strong>{pageInfo.lastEditor}</strong>
+              {pageInfo.updatedAt && <> · {formatRelativeTime(pageInfo.updatedAt)}</>}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Active user pills */}

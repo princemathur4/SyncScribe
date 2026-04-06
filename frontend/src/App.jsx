@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Routes, Route, useParams, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/Login";
@@ -107,9 +107,9 @@ function SearchBar({ onNavigateToSlug }) {
 function AppContent() {
   const { user, logout, authFetch, isInitialized } = useAuth();
   const navigate = useNavigate();
-  const { slug: urlSlug } = useParams();
+  const location = useLocation();
+  const urlSlug = location.pathname.match(/^\/page\/(.+)/)?.[1] ?? null;
   const [currentSlug, setCurrentSlug] = useState(urlSlug || null);
-  const [authScreen, setAuthScreen]   = useState("login");
 
   // Update URL when slug changes
   useEffect(() => {
@@ -138,13 +138,10 @@ function AppContent() {
         const res = await authFetch(`/api/pages/search?q=${encodeURIComponent(title)}`);
         if (res.ok) {
           const results = await res.json();
-          // Pick the first result whose title matches exactly (case-insensitive)
           const exact = results.find(
             (r) => r.title.toLowerCase() === title.toLowerCase()
           ) ?? results[0];
-          if (exact) {
-            handleNavigateToSlug(exact.slug);
-          }
+          if (exact) handleNavigateToSlug(exact.slug);
         }
       } catch { /* ignore */ }
     },
@@ -160,10 +157,13 @@ function AppContent() {
   }
 
   if (!user) {
-    if (authScreen === "login") {
-      return <LoginPage onSwitch={() => setAuthScreen("register")} onSuccess={() => {}} />;
-    }
-    return <RegisterPage onSwitch={() => setAuthScreen("login")} onSuccess={() => {}} />;
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage onSwitch={() => navigate("/register")} onSuccess={() => navigate("/")} />} />
+        <Route path="/register" element={<RegisterPage onSwitch={() => navigate("/login")} onSuccess={() => navigate("/")} />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
 
   return (
@@ -179,7 +179,11 @@ function AppContent() {
           </div>
           <div className="app-layout__topbar-right">
             <span>Signed in as <strong>{user.username}</strong></span>
-            <button type="button" className="app-layout__signout" onClick={logout}>
+            <button type="button" className="app-layout__signout" onClick={() => {
+              setCurrentSlug(null);
+              logout();
+              navigate("/login");
+            }}>
               Sign out
             </button>
           </div>
@@ -212,6 +216,8 @@ function AppContent() {
                 </div>
               }
             />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/register" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>
