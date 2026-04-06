@@ -16,9 +16,9 @@ from sqlalchemy import text
 
 # Import everything from the existing project code.
 # These are not duplicated here - we reuse what is already defined.
-from backend.modules.database.postgres import engine, SessionLocal, Base
-from backend.modules.models import User, Page
-from backend.modules.routers.auth import hash_password  # reuse the existing hashing function
+from modules.database.postgres import engine, SessionLocal, Base
+from modules.models import User, Page
+from modules.routers.auth import hash_password  # reuse the existing hashing function
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

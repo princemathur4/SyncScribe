@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: prince
+      POSTGRES_PASSWORD: 1234qwer5t
+      POSTGRES_DB: livedraft
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prince -d livedraft"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://prince:1234qwer5t@postgres:5432/livedraft
+      SECRET_KEY: your-super-secret-key-change-this-in-livedraft-prod
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
