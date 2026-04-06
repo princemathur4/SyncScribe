@@ -109,9 +109,20 @@ async def send_server_state(ws: WebSocket, room: Room) -> None:
 
 
 async def remove_client(ws: WebSocket, room: Room) -> None:
-    """Remove a client from a room. The Room object is kept alive intentionally
-    so the in-memory doc_state survives for the next person to join."""
+    """Remove a client from a room.
+
+    When the room becomes empty, doc_state is reset to empty so the next
+    joiner always re-seeds from the database (via the frontend onInitialSync
+    path). This prevents stale in-memory Yjs state from diverging from the
+    Postgres database, which is the single source of truth for page content.
+
+    Multi-user collaboration is unaffected: doc_state is only cleared when
+    ALL clients have left, so a second user joining an active room still
+    receives the live Yjs state from the first user.
+    """
     room.clients.discard(ws)
+    if not room.clients:
+        room.doc_state = b""
 
 
 async def broadcast(data: bytes, sender: WebSocket, room: Room) -> None:

@@ -87,6 +87,9 @@ function mountCollaborativeEditor({
   // save. Used in cleanup to decide whether a flush is needed regardless of
   // whether the debounce timer is still pending.
   let isDirty = false;
+  // Tracks whether the initial Yjs sync has completed. While false, ytext
+  // changes come from the server (not the user) and must not trigger a save.
+  let syncComplete = false;
 
   // 1. Yjs document
   const ydoc = new Y.Doc();
@@ -167,14 +170,19 @@ function mountCollaborativeEditor({
     if (ytext.toString() === "" && initialContent) {
       ydoc.transact(() => ytext.insert(0, initialContent));
     }
+    // Allow saves only after this point — changes before here are server-
+    // delivered state, not user edits.
+    syncComplete = true;
     provider.off("sync", onInitialSync);
   };
   provider.on("sync", onInitialSync);
 
   // Mirror ytext into React state for the preview; debounce saves to the API.
+  // Guard on syncComplete so that the server's initial sync payload (or the
+  // DB seed insert above) never triggers a spurious save back to the DB.
   const onYtextChange = () => {
     if (!destroyed) setPreviewContent(ytext.toString());
-    scheduleDebouncedSave();
+    if (syncComplete) scheduleDebouncedSave();
   };
 
   // On tab close / page refresh: cancel the pending debounce and flush
