@@ -1,4 +1,4 @@
-# LiveDraft
+# SyncScribe
 
 A real-time collaborative markdown editor for small teams.
 

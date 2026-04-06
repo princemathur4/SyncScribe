@@ -1,0 +1,49 @@
+.sidebar {
+  font-family: sans-serif;
+  width: 240px;
+  min-height: 100vh;
+  border-right: 1px solid #eee;
+  padding: 1rem;
+  font-size: 16px;
+  background-color: #fafafa;
+}
+
+.sidebar__brand {
+  font-size: 25px;
+}
+
+.sidebar__tree {
+  margin-top: 1rem;
+}
+
+.sidebar-folder {
+  margin-left: 1rem;
+}
+
+.sidebar-folder__toggle {
+  cursor: pointer;
+  padding: 4px 0;
+  font-weight: bold;
+  user-select: none;
+}
+
+.sidebar-page {
+  padding: 3px 0;
+  cursor: pointer;
+  color: #333;
+  font-size: 16px;
+}
+
+.sidebar-folder .sidebar-page {
+  margin-left: 1rem;
+}
+
+.sidebar-ungrouped {
+  margin-top: 1rem;
+}
+
+.sidebar-ungrouped__label {
+  color: #999;
+  font-size: 12px;
+  margin-bottom: 4px;
+}

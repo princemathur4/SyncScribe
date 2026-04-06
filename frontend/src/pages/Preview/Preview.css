@@ -1,0 +1,11 @@
+.preview {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0 0 4px 4px;
+  height: 66vh;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: sans-serif;
+  background-color: #fafafa;
+}
