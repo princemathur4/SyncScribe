@@ -32,10 +32,11 @@ The database is seeded automatically with sample pages and two demo accounts:
 - **Live preview toggle** — switch between editor and preview modes; preview supports full GitHub-flavored markdown rendering.
 - **Nested page tree** — pages organized hierarchically; sidebar shows a collapsible tree with expand/collapse per node.
 - **Page creation** — create new pages from the sidebar with an optional parent; URL slug is generated automatically.
+- **Page management** — delete and rename pages from the title bar when pages are opened. 
 - **Full-text search** — PostgreSQL `tsvector` search with highlighted snippets and context, debounced as you type.
 - **Wiki-links** — click `[[Page Name]]` links in the preview to navigate directly to that page.
 - **Last edited metadata** — each page tracks the user who last edited it and the timestamp.
-- **JWT authentication** — register/login flow; all write operations require a valid token.
+- **JWT authentication** — register/login flow with automatic redirects for unauthenticated users; all write operations require a valid token.
 - **Editor toolbar** — quick formatting buttons for bold, italic, headers, code blocks, and lists.
 - **Desktop UI** — works on desktop browsers with a collapsible sidebar and clean layout.
 - **Database persistence** — all pages and user data persist in PostgreSQL; collaborative state fully recovers on reconnect.

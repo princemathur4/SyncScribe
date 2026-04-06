@@ -568,6 +568,9 @@ App.jsx
     with title + ts_headline snippets. Closes on outside click.
   - navigateByTitle(title): used by wiki-link clicks. Calls search API with
     the raw title, finds the exact-match result (case-insensitive), sets slug.
+  - Routing: uses useLocation() to extract the slug from the URL; renders
+    authentication screens (Login/Register) for unauthenticated users.
+    Authenticated users see the editor/preview layout with sidebar navigation.
 
 AuthContext.jsx
   - Single source of auth truth. Exposes: user, token, login, logout,
@@ -606,6 +609,10 @@ Sidebar.jsx
     by services/pages.py::build_tree() in O(n).
   - PageNode is a recursive component. Root pages (depth=0) default to open.
   - Create-page form includes a parent selector (flat dropdown from tree).
+  - Page management: each page node displays delete and rename buttons on hover.
+    Delete shows a confirmation dialog before removing the page.
+  - Sidebar content supports horizontal scrolling for long page names that exceed
+    the sidebar width (display: flex with white-space: nowrap).
 
 Toolbar.jsx
   - wrapSelection(prefix, suffix): wraps selected text, e.g. **bold**.
