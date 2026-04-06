@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/Login";
@@ -105,8 +106,30 @@ function SearchBar({ onNavigateToSlug }) {
 // ── Main app shell ────────────────────────────────────────────────────────────
 function AppContent() {
   const { user, logout, authFetch, isInitialized } = useAuth();
-  const [currentSlug, setCurrentSlug] = useState(null);
-  const [authScreen, setAuthScreen]   = useState("login");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const urlSlug = location.pathname.match(/^\/page\/(.+)/)?.[1] ?? null;
+  const [currentSlug, setCurrentSlug] = useState(urlSlug || null);
+
+  // Update URL when slug changes
+  useEffect(() => {
+    if (!urlSlug && currentSlug) {
+      navigate(`/page/${currentSlug}`, { replace: true });
+    }
+  }, [currentSlug, urlSlug, navigate]);
+
+  // Update currentSlug when URL changes
+  useEffect(() => {
+    if (urlSlug) {
+      setCurrentSlug(urlSlug);
+    }
+  }, [urlSlug]);
+
+  // Handle navigation to a page by slug
+  const handleNavigateToSlug = useCallback((slug) => {
+    setCurrentSlug(slug);
+    navigate(`/page/${slug}`);
+  }, [navigate]);
 
   // Wiki-link navigation: [[Page Name]] → find slug by title, then open it
   const navigateByTitle = useCallback(
@@ -115,15 +138,14 @@ function AppContent() {
         const res = await authFetch(`/api/pages/search?q=${encodeURIComponent(title)}`);
         if (res.ok) {
           const results = await res.json();
-          // Pick the first result whose title matches exactly (case-insensitive)
           const exact = results.find(
             (r) => r.title.toLowerCase() === title.toLowerCase()
           ) ?? results[0];
-          if (exact) setCurrentSlug(exact.slug);
+          if (exact) handleNavigateToSlug(exact.slug);
         }
       } catch { /* ignore */ }
     },
-    [authFetch]
+    [authFetch, handleNavigateToSlug]
   );
 
   if (!isInitialized) {
@@ -135,44 +157,68 @@ function AppContent() {
   }
 
   if (!user) {
-    if (authScreen === "login") {
-      return <LoginPage onSwitch={() => setAuthScreen("register")} onSuccess={() => {}} />;
-    }
-    return <RegisterPage onSwitch={() => setAuthScreen("login")} onSuccess={() => {}} />;
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginPage onSwitch={() => navigate("/register")} onSuccess={() => navigate("/")} />} />
+        <Route path="/register" element={<RegisterPage onSwitch={() => navigate("/login")} onSuccess={() => navigate("/")} />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
 
   return (
     <div className="app-layout">
-      <Sidebar onPageClick={setCurrentSlug} activeSlug={currentSlug} />
+      <Sidebar onPageClick={handleNavigateToSlug} activeSlug={currentSlug} />
 
       <div className="app-layout__main-column">
         <div className="app-layout__topbar">
           {/* left spacer — keeps search centred via the 1fr | auto | 1fr grid */}
           <div />
           <div className="app-layout__topbar-search">
-            <SearchBar onNavigateToSlug={setCurrentSlug} />
+            <SearchBar onNavigateToSlug={handleNavigateToSlug} />
           </div>
           <div className="app-layout__topbar-right">
             <span>Signed in as <strong>{user.username}</strong></span>
-            <button type="button" className="app-layout__signout" onClick={logout}>
+            <button type="button" className="app-layout__signout" onClick={() => {
+              setCurrentSlug(null);
+              logout();
+              navigate("/login");
+            }}>
               Sign out
             </button>
           </div>
         </div>
 
         <div className="app-layout__content">
-          {currentSlug ? (
-            <CollaborativeEditor
-              pageSlug={currentSlug}
-              username={user.username}
-              onNavigate={navigateByTitle}
+          <Routes>
+            <Route
+              path="/page/:slug"
+              element={
+                currentSlug ? (
+                  <CollaborativeEditor
+                    pageSlug={currentSlug}
+                    username={user.username}
+                    onNavigate={navigateByTitle}
+                  />
+                ) : (
+                  <div className="app-layout__placeholder">
+                    <h2>Loading…</h2>
+                  </div>
+                )
+              }
             />
-          ) : (
-            <div className="app-layout__placeholder">
-              <h2>Welcome, {user.username}</h2>
-              <p>Select a page from the sidebar or create a new one to get started.</p>
-            </div>
-          )}
+            <Route
+              path="/"
+              element={
+                <div className="app-layout__placeholder">
+                  <h2>Welcome, {user.username}</h2>
+                  <p>Select a page from the sidebar or create a new one to get started.</p>
+                </div>
+              }
+            />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/register" element={<Navigate to="/" replace />} />
+          </Routes>
         </div>
       </div>
     </div>

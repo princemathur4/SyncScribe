@@ -39,6 +39,7 @@ The database is seeded automatically with sample pages and two demo accounts:
 - **Editor toolbar** — quick formatting buttons for bold, italic, headers, code blocks, and lists.
 - **Desktop UI** — works on desktop browsers with a collapsible sidebar and clean layout.
 - **Database persistence** — all pages and user data persist in PostgreSQL; collaborative state fully recovers on reconnect.
+- **Real-time cursor indicators** — see which users are currently editing and their cursor positions.
 
 ### 📋 Planned Features
 
@@ -47,7 +48,6 @@ The database is seeded automatically with sample pages and two demo accounts:
 - **Version history & page rollback** — restore previous versions of pages with diff view and full revision history.
 - **Page-level permissions** — granular sharing controls (view-only, edit, admin) for specific pages or folders.
 - **File and image uploads** — embed images and attachments directly within pages.
-- **Real-time cursor indicators** — see which users are currently editing and their cursor positions.
 - **Comments and annotations** — inline comments on pages with threaded discussions.
 - **Page templates** — create reusable page templates for consistent documentation.
 - **Dark mode** — theme toggle for editor and UI.
@@ -100,7 +100,7 @@ Browser (React + CodeMirror 6 + Yjs)
 ```
 
 - **Frontend:** React + Vite. CodeMirror 6 handles editing. Yjs manages shared document state across all connected clients. `y-websocket` handles the sync protocol.
-- **Backend:** FastAPI. REST routes handle auth and page persistence. A separate WebSocket route acts as a Yjs relay, broadcasting binary updates to all clients in the same room.
+- **Backend:** FastAPI. REST routes handle auth and page persistence. A separate WebSocket route implements the y-websocket binary protocol: it stores each incoming Yjs update in an ordered list per room and replays them individually to new joiners, then broadcasts live edits to all other connected clients.
 - **Database:** PostgreSQL via SQLAlchemy. Stores users, pages (with nested parent/child relationships), and `tsvector` columns for full-text search.
 
 ---
@@ -142,7 +142,9 @@ The central design question was how to handle concurrent edits from multiple use
 
 `y-websocket`'s `WebsocketProvider` handles reconnection automatically with exponential backoff. On reconnect, it re-executes the sync handshake (step 1 → step 2) so the client catches up on any updates it missed while offline.
 
-On the server, when the last client leaves a room the in-memory Yjs state is cleared. The next client to join re-seeds from the database via the `onInitialSync` callback, keeping the in-memory state consistent with PostgreSQL as the source of truth.
+On the server, each room stores a list of individual Yjs update blobs (`room.updates`). When a new client joins, each update is sent as a separate sync-step-2 message so Yjs applies them all in order. Concatenating them into a single blob and sending once does not work — the Yjs binary parser reads the first encoded structure and silently stops, dropping every subsequent edit.
+
+When the last client leaves a room, `room.updates` is cleared. The next client to join re-seeds from the database via the `onInitialSync` callback, keeping the in-memory state consistent with PostgreSQL as the source of truth.
 
 ### Database Schema
 
