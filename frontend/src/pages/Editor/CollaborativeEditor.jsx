@@ -15,6 +15,19 @@ const WS_BASE_URL = "ws://localhost:8000/ws";
 const AWARENESS_OUTDATED_MS = 3000;
 const SAVE_DEBOUNCE_MS = 2000;
 
+function formatRelativeTime(dateString) {
+  if (!dateString) return "";
+  const diffMs = Date.now() - new Date(dateString).getTime();
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(dateString).toLocaleDateString();
+}
+
 // Random hex color for this client's cursor / presence badge
 function randomCollaboratorColor() {
   return "#" + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0");
@@ -205,7 +218,7 @@ function mountCollaborativeEditor({
   };
 }
 
-function CollaborativeEditor({ pageSlug, username }) {
+function CollaborativeEditor({ pageSlug, username, onNavigate }) {
   const { authFetch } = useAuth();
   const editorContainerRef = useRef(null);
   // Ref to the mounted EditorView (Toolbar uses this to apply formatting)
@@ -217,6 +230,7 @@ function CollaborativeEditor({ pageSlug, username }) {
   const [previewContent, setPreviewContent] = useState("");
   const [viewMode, setViewMode] = useState("split"); // "edit" | "split" | "preview"
   const [pageLoading, setPageLoading] = useState(true);
+  const [pageInfo, setPageInfo] = useState(null); // { last_editor, updated_at }
 
   useEffect(() => {
     if (!editorContainerRef.current) return;
@@ -236,7 +250,13 @@ function CollaborativeEditor({ pageSlug, username }) {
         if (res.ok) {
           const page = await res.json();
           initialContent = page.body ?? "";
-          if (!cancelled) setPreviewContent(initialContent);
+          if (!cancelled) {
+            setPreviewContent(initialContent);
+            setPageInfo({
+              lastEditor: page.last_editor?.username ?? null,
+              updatedAt: page.updated_at ?? null,
+            });
+          }
         }
       } catch (err) {
         console.error("Failed to load page content:", err);
@@ -290,6 +310,12 @@ function CollaborativeEditor({ pageSlug, username }) {
           </strong>
         </span>
         <span>Users editing: <strong>{connectedUsers}</strong></span>
+        {pageInfo?.lastEditor && (
+          <span style={{ color: "#999" }}>
+            Last edited by <strong>{pageInfo.lastEditor}</strong>
+            {pageInfo.updatedAt && <> · {formatRelativeTime(pageInfo.updatedAt)}</>}
+          </span>
+        )}
         <span style={{
           marginLeft: "auto",
           color: saveStatus === "saved" ? "green" : saveStatus === "error" ? "red" : "#999",
@@ -366,7 +392,7 @@ function CollaborativeEditor({ pageSlug, username }) {
         {/* Preview pane - hidden in edit mode */}
         {viewMode !== "edit" && (
           <div style={{ flex: 1, borderLeft: viewMode === "split" ? "2px solid #eee" : "none" }}>
-            <Preview content={previewContent} />
+            <Preview content={previewContent} onNavigate={onNavigate} />
           </div>
         )}
       </div>

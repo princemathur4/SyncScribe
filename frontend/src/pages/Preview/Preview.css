@@ -9,3 +9,44 @@
   font-family: sans-serif;
   background-color: #fafafa;
 }
+
+/* ── Tables (GFM) ────────────────────────────────────────────────────────── */
+.preview table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 14px;
+}
+
+.preview th,
+.preview td {
+  border: 1px solid #d0d0d0;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.preview th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.preview tr:nth-child(even) td {
+  background-color: #f8f8f8;
+}
+
+/* ── Wiki links [[Page Name]] ────────────────────────────────────────────── */
+.wiki-link {
+  color: #4f46e5;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.wiki-link:hover {
+  color: #3730a3;
+  text-decoration-style: solid;
+  background-color: #eef2ff;
+}
