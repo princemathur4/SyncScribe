@@ -51,7 +51,7 @@ function LoginPage({ onSwitch, onSuccess }) {
 
   return (
     <div className="login-page">
-      <h1 className="login-page__title">SyncScribe</h1>
+      <h1 className="login-page__title">LiveDraft</h1>
       <div className="login-page__card">
         <h2 className="login-page__cardtitle">Sign in</h2>
 

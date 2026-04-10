@@ -117,7 +117,7 @@ function Sidebar({ onPageClick, activeSlug, onPageCreated }) {
     <div className="sidebar">
       {/* Header */}
       <div className="sidebar__header">
-        <h1 className="sidebar__brand">SyncScribe</h1>
+        <h1 className="sidebar__brand">LiveDraft</h1>
         <button
           onClick={() => { setNewParentId(null); setCreating((prev) => !prev); }}
           className="sidebar__new-page-btn"

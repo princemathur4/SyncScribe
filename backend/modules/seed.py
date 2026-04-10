@@ -1,5 +1,5 @@
 """
-SyncScribe Database Seed Script
+LiveDraft Database Seed Script
 ==============================
 Creates all tables and populates them with initial data.
 
@@ -308,7 +308,7 @@ def seed(db):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="SyncScribe database seed script")
+    parser = argparse.ArgumentParser(description="LiveDraft database seed script")
     parser.add_argument(
         "--reset",
         action="store_true",

@@ -1,4 +1,4 @@
-# SyncScribe
+# LiveDraft
 
 A real-time collaborative markdown editor for small teams. Multiple users can edit the same page simultaneously, with changes syncing instantly via Yjs CRDTs.
 

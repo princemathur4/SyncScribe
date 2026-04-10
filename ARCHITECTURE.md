@@ -11,7 +11,7 @@ This document reflects the current state of the codebase. Sections marked
 1. WHAT THIS PROJECT IS
 --------------------------------------------------------------------------------
 
-SyncScribe is a real-time collaborative markdown wiki for small teams. Think
+LiveDraft is a real-time collaborative markdown wiki for small teams. Think
 Notion meets a simple wiki. It is a full-stack web application with three main
 parts:
 
@@ -99,7 +99,7 @@ BACKEND
 --------------------------------------------------------------------------------
 3. PROJECT FILE STRUCTURE (CURRENT)
 --------------------------------------------------------------------------------
-
+```
 co_edit/
 ├── ARCHITECTURE.md              ← this file
 ├── backend/
@@ -148,7 +148,7 @@ co_edit/
             │   └── Toolbar.jsx             # formatting buttons (bold, italic, …)
             ├── Login/
             └── Register/
-
+```
 
 --------------------------------------------------------------------------------
 4. DATABASE SCHEMA
@@ -594,7 +594,7 @@ CollaborativeEditor.jsx
 
 Preview.jsx
   - preprocessWikiLinks() converts [[Page Name]] → [Page Name](#wiki:…) before
-    ReactMarkdown parses. The custom <a> renderer intercepts #wiki: hrefs and
+    ReactMarkdown parses. The custom `<a>` renderer intercepts #wiki: hrefs and
     calls onNavigate(title) instead of following the link.
   - DOMPurify removed. react-markdown renders to React elements, not raw HTML,
     so no XSS risk exists. DOMPurify was stripping <mark> tags (search
@@ -680,26 +680,28 @@ PREREQUISITES: Node 18+, Python 3.10+, PostgreSQL
 
 DATABASE SETUP (one-time):
   psql -U postgres
-  CREATE USER syncscribe WITH PASSWORD 'syncscribe';
-  CREATE DATABASE syncscribe OWNER syncscribe;
+  CREATE USER livedraft WITH PASSWORD 'livedraft';
+  CREATE DATABASE livedraft OWNER livedraft;
   \q
 
 BACKEND:
-  cd backend
-  pip install -r requirements.txt
-  # create .env with at minimum:
-  #   DATABASE_URL=postgresql://syncscribe:syncscribe@localhost/syncscribe
-  #   SECRET_KEY=<random string>
-  uvicorn backend.modules.application:app --reload --port 8000
-  # Tables are auto-created via Base.metadata.create_all() on startup
-  # Seed data: python backend/seed.py
-  # API docs: http://localhost:8000/docs
+  - cd backend
+  - pip install -r requirements.txt
+  - create .env with at minimum:
+    ```
+      DATABASE_URL=postgresql://livedraft:livedraft@localhost/livedraft
+      SECRET_KEY=<random string>
+    ```
+  - uvicorn backend.modules.application:app --reload --port 8000
+  - Tables are auto-created via Base.metadata.create_all() on startup
+  - Seed data: python backend/seed.py
+  - API docs: http://localhost:8000/docs
 
 FRONTEND:
-  cd frontend
-  npm install
-  npm run dev
-  # App: http://localhost:5173
+  - cd frontend
+  - npm install
+  - npm run dev
+  - App: http://localhost:5173
 
 TEST COLLABORATION:
   Open http://localhost:5173 in two browser tabs (same or different users).

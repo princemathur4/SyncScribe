@@ -54,7 +54,7 @@ function RegisterPage({ onSwitch, onSuccess }) {
 
   return (
     <div className="register-page">
-      <h1 className="register-page__title">SyncScribe</h1>
+      <h1 className="register-page__title">LiveDraft</h1>
       <div className="register-page__card">
         <h2 className="register-page__cardtitle">Create your account</h2>
 
